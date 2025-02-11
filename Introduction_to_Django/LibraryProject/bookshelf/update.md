@@ -1,4 +1,3 @@
-from bookshelf.models import Book
 
 # Code
 book.title = “Nineteen Eighty-Four”
