@@ -1,4 +1,5 @@
 # Code
+book = Book.objects.get(author="1984")
 print(book.title)
 print(book.author)
 print(book.publication_year)
