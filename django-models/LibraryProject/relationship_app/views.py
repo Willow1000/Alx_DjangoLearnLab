@@ -4,4 +4,4 @@ from .models import Book
 # Create your views here.
 def show_books(request):
     books = Book.objects.all()
-    return books
+    return render(request, 'relationship_app/list_books.html', {'books': books})
