@@ -1,6 +1,9 @@
 from .models import Author, Book, Library, Librarian
 
-print(Book.objects.filter(author='specific_author'))
-print(Library.objects.all())
-library_name = Library.objects.get('name')
-print(Librarian.objects.get(library=library_name))
+books = Book.objects.get(author=Author.objects.get(name="specific name").name)
+print(books.all())
+
+library = Library.objects.get(id=1)
+print(library.all())
+
+print(Librarian.objects.get(library=Library.objects.get(name="Library Name")))
