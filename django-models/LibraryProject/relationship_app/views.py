@@ -17,17 +17,17 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     content_type = 'library'
 
-class Register(CreateView):
+class register(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'relationship_app/register.html'
 
-class Login(CreateView):
+class LoginView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'relationship_app/login.html'    
 
-class Logout(CreateView):
+class LogoutView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('logout')  
     template_name = 'relationship_app/logout.html'
