@@ -29,7 +29,7 @@ class Librarian(models.Model):
         return self.name
 
 
-class User(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
     role = models.CharField(max_length=255,choices=['Admin','Librarian','Member'])
 
