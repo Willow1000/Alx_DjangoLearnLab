@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import list_books, LibraryDetailView
-
+from . import admin_view, librarian_view, member_view
 from . import views
 from .views import *
 
