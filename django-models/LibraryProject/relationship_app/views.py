@@ -10,27 +10,27 @@ from django.urls import reverse_lazy
 # Create your views here.
 def list_books(request):
     books = Book.objects.all()
-    return render(request, 'relationship_app/list_books.html', {'books': books})
+    return render(request, 'relationship_app/templates/relationship_app/list_books.html', {'books': books})
 
 class LibraryDetailView(DetailView):
     model = Library
-    template_name = 'relationship_app/library_detail.html'
+    template_name = 'relationship_app/templates/relationship_app/library_detail.html'
     content_type = 'library'
 
 class register(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
-    template_name = 'relationship_app/register.html'
+    template_name = 'relationship_app/templates/relationship_app/register.html'
 
 class LoginView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
-    template_name = 'relationship_app/login.html'    
+    template_name = 'relationship_app/templates/relationship_app/login.html'    
 
 class LogoutView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('logout')  
-    template_name = 'relationship_app/logout.html'
+    template_name = 'relationship_app/templates/relationship_app/logout.html'
 
 class AdminView(CreateView):  
     pass  
