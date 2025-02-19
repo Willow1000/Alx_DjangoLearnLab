@@ -8,6 +8,10 @@ from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Book
+from .forms import BookForm
 
 
 
@@ -36,6 +40,21 @@ class LogoutView(CreateView):
     success_url = reverse_lazy('logout')  
     template_name = 'relationship_app/templates/relationship_app/logout.html'
 
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    published_date = models.DateField()
+
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add book"),
+            ("can_change_book", "Can change book"),
+            ("can_delete_book", "Can delete book"),
+        ]
+
+    def __str__(self):
+        return self.title
 
 # Function to check if the user is a Librarian
 def is_librarian(user):
@@ -67,3 +86,37 @@ def member_view(request):
     return HttpResponse("Welcome, Member! You have access to the Member section.")
 
       
+
+# Add Book View
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('book_list')
+    else:
+        form = BookForm()
+    return render(request, 'add_book.html', {'form': form})
+
+# Edit Book View
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('book_detail', pk=book.pk)
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'edit_book.html', {'form': form, 'book': book})
+
+# Delete Book View
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('book_list')
+    return render(request, 'confirm_delete.html', {'book': book})
