@@ -3,7 +3,6 @@ from django.views.generic import DetailView, CreateView
 from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
 from .models import Book, Library
-from .forms import BookForm
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
@@ -34,50 +33,59 @@ def is_librarian(user):
 
 @user_passes_test(is_librarian)
 def librarian_view(request):
-    return render(request,'templates\\relationship_app\\member_view.html')
+    return render(request, 'relationship_app/librarian_view.html')
 
 def is_admin(user):
     return user.userprofile.role == 'Admin'
 
 @user_passes_test(is_admin)
 def admin_view(request):
-    return render(request,'templates\\relationship_app\\admin_view.html')
+    return render(request, 'relationship_app/admin_view.html')
 
 def is_member(user):
     return user.userprofile.role == 'Member'
 
 @user_passes_test(is_member)
 def member_view(request):
-    return render(request,'templates\\relationship_app\\member_view.html')
+    return render(request, 'relationship_app/member_view.html')
 
 # Book Views with permissions
 @permission_required('relationship_app.can_add_book', raise_exception=True)
 def add_book(request):
     if request.method == 'POST':
-        form = BookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('book_list')
-    else:
-        form = BookForm()
-    return render(request, 'add_book.html', {'form': form})
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        published_date = request.POST.get('published_date')
+
+        # Create a new book instance and save it
+        new_book = Book(title=title, author=author, published_date=published_date)
+        new_book.save()
+
+        return redirect('book_list')
+
+    return render(request, 'add_book.html')
 
 @permission_required('relationship_app.can_change_book', raise_exception=True)
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
+
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
-        if form.is_valid():
-            form.save()
-            return redirect('book_detail', pk=book.pk)
-    else:
-        form = BookForm(instance=book)
-    return render(request, 'edit_book.html', {'form': form, 'book': book})
+        book.title = request.POST.get('title')
+        book.author = request.POST.get('author')
+        book.published_date = request.POST.get('published_date')
+
+        # Save the edited book
+        book.save()
+        return redirect('book_detail', pk=book.pk)
+
+    return render(request, 'edit_book.html', {'book': book})
 
 @permission_required('relationship_app.can_delete_book', raise_exception=True)
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
+
     if request.method == 'POST':
         book.delete()
         return redirect('book_list')
+
     return render(request, 'confirm_delete.html', {'book': book})
