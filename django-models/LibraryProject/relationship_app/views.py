@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
 from .models import Book, Library
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 
-# Views
+
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
