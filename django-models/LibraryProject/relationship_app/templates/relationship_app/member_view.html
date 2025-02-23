@@ -1,13 +1,7 @@
-<!-- templates/myapp/member_view.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member View</title>
-</head>
-<body>
-    <h1>Welcome to the Member View!</h1>
-    <p>You are logged in as a Member.</p>
-</body>
-</html>
+<!-- member_view.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Welcome, Member!</h1>
+    <p>This page is only accessible by users with the 'Member' role.</p>
+{% endblock %}
