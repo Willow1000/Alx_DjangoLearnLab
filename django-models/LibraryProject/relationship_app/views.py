@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DetailView, CreateView
 from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
-from .models import Book, Library
+from .models import Book
+from .models import Library
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.forms import UserCreationForm
