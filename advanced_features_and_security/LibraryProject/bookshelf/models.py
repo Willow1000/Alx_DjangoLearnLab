@@ -8,14 +8,14 @@ class Book(models.Model):
     publication_year = models.DateField()
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     def __init__(self):
         self.date_of_birth = models.DateField()
         self.profile_photo = models.ImageField(upload_to='profile_photos', blank=True)
     def create_user(self):
-        user = User.objects.create_user(date_of_birth=self.date_of_birth,profile_photo=self.profile_photo)
-        user.save()
+        self.objects.create_user(date_of_birth=self.date_of_birth,profile_photo=self.profile_photo)
 
-    def create_super
+    def create_superuser(self):
+        self.objects.create_superuser(date_of_birth=self.date_of_birth,profile_photo=self.profile_photo)
 
 
