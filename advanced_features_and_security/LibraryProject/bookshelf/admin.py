@@ -15,4 +15,4 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("date_of_birth")
     search_fields = ("profile_photo","date_of_birth")
 
-admin.site.register(CustomUser,CustomUserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
