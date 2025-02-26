@@ -22,3 +22,13 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     objects = CustomUserManager()
+    def can_create(self):
+        return self.has_perm("bookshelf.can_add_book")
+
+    def can_add(self):
+        return self.has_perm("bookshelf.can_change_book")
+    def can_edit(self):
+        return self.has_perm("bookshelf.can_delete_book")
+    def can_delete(self):
+        return self.has_perm("bookshelf.can_delete_book")
+
