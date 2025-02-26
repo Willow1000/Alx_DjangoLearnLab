@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=0ybu&ul#d0&kqr7&yli%wxmobdx2re1f51t@1%a8@6v21mtb9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -122,5 +122,36 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+# Security Headers
+SECURE_BROWSER_XSS_FILTER = True  # Protects against XSS attacks
+X_FRAME_OPTIONS = 'DENY'  # Prevents Clickjacking attacks
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
+
+# Enforce HTTPS-only cookies
+CSRF_COOKIE_SECURE = True  # CSRF cookie will only be sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookie will only be sent over HTTPS
+
+# Content Security Policy (CSP) using django-csp middleware
+INSTALLED_APPS += ['csp']
+
+CSP_DEFAULT_SRC = ("'self'",)  # Only allow resources from the same domain
+CSP_SCRIPT_SRC = ("'self'", "https://trusted-cdn.com")  # Allow scripts from self and a trusted CDN
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://trusted-styles.com")
+CSP_IMG_SRC = ("'self'", "data:")
+CSP_FRAME_ANCESTORS = ("'none'",)  # Prevents embedding in iframes
+
+MIDDLEWARE += [
+    'csp.middleware.CSPMiddleware',  # Enable CSP protection
+]
+
+# Ensure HTTPS usage (for production)
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_HTTPONLY = True  # Prevents JavaScript access to session cookie
+CSRF_COOKIE_HTTPONLY = True  # Prevents JavaScript access to CSRF cookie
+SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for one year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
