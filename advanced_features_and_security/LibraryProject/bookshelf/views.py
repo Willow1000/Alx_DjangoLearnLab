@@ -8,4 +8,4 @@ def add_book(request):
     return render(request, "add_book.html")
 
 
-boo_list
+book_list
