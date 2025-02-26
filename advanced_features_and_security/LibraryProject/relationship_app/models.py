@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User 
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 class Author(models.Model):
     name = models.CharField(max_length=255)
 
@@ -49,9 +51,6 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
-# Django signal to create a UserProfile whenever a new User is created
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
