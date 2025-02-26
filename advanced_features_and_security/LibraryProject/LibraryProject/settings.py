@@ -153,5 +153,11 @@ SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for one year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
+# Ensure Django recognizes HTTPS when behind a proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Redirect all HTTP traffic to HTTPS (ensure this is True in production)
+SECURE_SSL_REDIRECT = True
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
