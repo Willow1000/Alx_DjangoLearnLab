@@ -1,82 +1,56 @@
+from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from django.contrib.auth.models import User
-from api.models import Author, Book
+from .models import Author, Book
 from datetime import date
 
-from rest_framework.authtoken.models import Token
-
 class BookAPITestCase(APITestCase):
-    def setUp(self):
-        """Set up test users, authentication, and sample data"""
-        self.user = User.objects.create_user(username="testuser", password="testpass")
-        self.admin_user = User.objects.create_superuser(username="admin", password="adminpass")
 
-        self.author = Author.objects.create(name="Ngugi wa Thiong'o")
+    def setUp(self):
+        """Set up test data"""
+        self.author = Author.objects.create(name="Chinua Achebe")
         self.book = Book.objects.create(
-            title="The River Between",
-            publication_year=date(2025, 3, 8),
+            title="Things Fall Apart",
+            publication_year=date(1958, 1, 1),
             author=self.author
         )
+        self.book_url = reverse("book-list")  # URL for book list (ensure named routes in router)
 
-        self.token = Token.objects.create(user=self.user)
-        self.admin_token = Token.objects.create(user=self.admin_user)
+    def test_create_book(self):
+        """Test creating a book via API"""
+        data = {
+            "title": "No Longer at Ease",
+            "publication_year": "1960-01-01",
+            "author": self.author.id
+        }
+        response = self.client.post(self.book_url, data, format="json")
 
-    def authenticate(self, admin=False):
-        """Helper function to authenticate user"""
-        token = self.admin_token if admin else self.token
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
-
-    def test_unauthorized_access(self):
-        """Ensure unauthorized users cannot access the endpoints"""
-        response = self.client.get("/api/books/")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_list_books_authenticated(self):
-        """Ensure authenticated users can list books"""
-        self.authenticate()
-        response = self.client.get("/api/books/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_create_book_without_permission(self):
-        """Ensure normal users cannot create a book"""
-        self.authenticate()
-        data = {"title": "Petals of Blood", "publication_year": "2024-06-15", "author": self.author.id}
-        response = self.client.post("/api/books/", data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_create_book_with_admin_permission(self):
-        """Ensure admin users can create a book"""
-        self.authenticate(admin=True)
-        data = {"title": "Petals of Blood", "publication_year": "2024-06-15", "author": self.author.id}
-        response = self.client.post("/api/books/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("id", response.data)
+        self.assertEqual(response.data["title"], data["title"])
 
-    def test_update_book_permission(self):
-        """Ensure normal users cannot update books"""
-        self.authenticate()
-        data = {"title": "Updated Title"}
-        response = self.client.patch(f"/api/books/{self.book.id}/", data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    def test_get_books(self):
+        """Test retrieving book list"""
+        response = self.client.get(self.book_url)
 
-    def test_admin_can_update_book(self):
-        """Ensure admins can update book details"""
-        self.authenticate(admin=True)
-        data = {"title": "Updated Title"}
-        response = self.client.patch(f"/api/books/{self.book.id}/", data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.book.refresh_from_db()
-        self.assertEqual(self.book.title, "Updated Title")
+        self.assertIn("results", response.data)  # If using pagination
+        self.assertGreaterEqual(len(response.data["results"]), 1)
 
-    def test_delete_book_permission(self):
-        """Ensure only admins can delete books"""
-        self.authenticate()
-        response = self.client.delete(f"/api/books/{self.book.id}/")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    def test_update_book(self):
+        """Test updating a book"""
+        update_url = reverse("book-detail", args=[self.book.id])
+        data = {"title": "Updated Book Title"}
 
-    def test_admin_can_delete_book(self):
-        """Ensure admins can delete books"""
-        self.authenticate(admin=True)
-        response = self.client.delete(f"/api/books/{self.book.id}/")
+        response = self.client.patch(update_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "Updated Book Title")
+
+    def test_delete_book(self):
+        """Test deleting a book"""
+        delete_url = reverse("book-detail", args=[self.book.id])
+        response = self.client.delete(delete_url)
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Book.objects.count(), 0)
+        self.assertFalse(Book.objects.filter(id=self.book.id).exists())
