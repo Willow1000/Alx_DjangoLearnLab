@@ -16,7 +16,8 @@ urlpatterns = [
     path("comment/<int:pk>/update/",Comments.as_view(),name="comments")
     path("post/<int:pk>/comments/new/",Comments.as_view(),name="comments")
     path("comment/<int:pk>/delete/",Comments.as_view(),name="comments")
-    path("tags/<slug:tag_slug>/",PostByTagListView.as_view(),name="comments")
+    path("tags/<slug:tag_slug>/",PostByTagListView.as_view(),name="comments"),
+    path("profile/",ProfileView.as_view(),name="profile")
 ]
 
 from Django_Blog import settings
