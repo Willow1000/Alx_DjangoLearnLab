@@ -7,6 +7,21 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import *
 # Create your views here.
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import ProfileForm  # Ensure you create this form
+
+@login_required
+def update_profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()  # ✅ Save updated user details
+            return redirect("profile")  # Redirect after updating profile
+    else:
+        form = ProfileForm(instance=request.user)  # Pre-fill form with user details
+    
+    return render(request, "profile_update.html", {"form": form})
 
 class RegistrationView(CreateView):
     form_class = SignUpForm
