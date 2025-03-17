@@ -59,6 +59,18 @@ TEMPLATES = [
     },
 ]
 
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+TEMPLATES = [
+    {
+        'DIRS': [BASE_DIR / 'templates'],
+    },
+]
+
 LOGIN_URL = 'login/'
 
 WSGI_APPLICATION = 'Django_Blog.wsgi.application'
