@@ -51,7 +51,7 @@ class Like(models.Model):
 class Links(models.Model):
     keyword = models.CharField(max_length=100)
     url = models.URLField(max_length=100)
-    post
+  
 class Post(models.Model):
     CATEGORY_CHOICES = (("Beauty","beauty"),
                         ("Lifestyle","lifestyle"),
@@ -71,7 +71,7 @@ class Post(models.Model):
         return self.Title
 class Comment(models.Model):
     user = models.ForeignKey(Author,on_delete=models.CASCADE)
-    blog = models.ForeignKey(Post,on_delete=models.CASCADE)
+    post = models.ForeignKey(Post,on_delete=models.CASCADE)
     content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -30,65 +30,65 @@ class CustomLogoutView(LogoutView):
         return redirect(self.next_page)
 
 
-class CreateBlogView(UserPassesTestMixin,LoginRequiredMixin,CreateView):
-    model = Blog
+class CreatePostView(UserPassesTestMixin,LoginRequiredMixin,CreateView):
+    model = Post
     fields = ["category","Title",'Cover_image',"Content"]
-    template_name = "createblog.html"
+    template_name = "createPost.html"
     success_url = reverse_lazy("home")
 
     def test_func(self):
-        return self.request.user.role == "Blogger" or self.request.user.role == "Admin" 
+        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
     
     def form_valid(self, form):
-        form.instance.Blogger = self.request.user
+        form.instance.Postger = self.request.user
         return super().form_valid(form)
 
-class ListBlogView(ListView):
-    model = Blog
-    template_name = "blogs.html"
-    context_object_name = 'blogs'
+class ListPostView(ListView):
+    model = Post
+    template_name = "Posts.html"
+    context_object_name = 'Posts'
 
-class BlogView(LoginRequiredMixin,DetailView):
-    model=Blog
-    template_name="blog.html"
-    context_object_name="blog"  
+class PostView(LoginRequiredMixin,DetailView):
+    model=Post
+    template_name="Post.html"
+    context_object_name="Post"  
     login_url = reverse_lazy('login')  
 
-class DeleteBlogView(UserPassesTestMixin,LoginRequiredMixin,DeleteView):
-    model=Blog
-    template_name="blog.html"
-    context_object_name="blog"
-    success_url = reverse_lazy('blogs')  
+class DeletePostView(UserPassesTestMixin,LoginRequiredMixin,DeleteView):
+    model=Post
+    template_name="Post.html"
+    context_object_name="Post"
+    success_url = reverse_lazy('Posts')  
     def test_func(self):
-        return self.request.user.role == "Blogger" or self.request.user.role == "Admin" 
+        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
     
 
-class UpdateblogView(UserPassesTestMixin,LoginRequiredMixin,UpdateView):
-    model = Blog
-    template_name="updateblog.html"   
-    success_url = reverse_lazy("blogs") 
+class UpdatePostView(UserPassesTestMixin,LoginRequiredMixin,UpdateView):
+    model = Post
+    template_name="updatePost.html"   
+    success_url = reverse_lazy("Posts") 
     fields = ["Title","Cover_image","Content",'category']
     context_object_name='record'
 
     def test_func(self):
-        return self.request.user.role == "Blogger" or self.request.user.role == "Admin" 
+        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
     
     def get_success_url(self):
-        return reverse_lazy("blog",kwargs = {"pk":self.kwargs["pk"]})
+        return reverse_lazy("Post",kwargs = {"pk":self.kwargs["pk"]})
     
-class CreateComment(CreateView):
+class CommentCreateView(CreateView):
     form_class = CommentForm
     template_name = "commentform.html" 
-    # success_url = reverse_lazy("blog")   
+    # success_url = reverse_lazy("Post")   
 
     def form_valid(self,form):
         form.instance.user = self.request.user
-        blog = get_object_or_404(Blog,pk = self.kwargs['pk'])
-        form.instance.blog = blog
+        Post = get_object_or_404(Post,pk = self.kwargs['pk'])
+        form.instance.Post = Post
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy("blog",kwargs = {"pk":self.kwargs["pk"]})
+        return reverse_lazy("Post",kwargs = {"pk":self.kwargs["pk"]})
     
 class Comments(ListView):
     model = Comment
@@ -96,13 +96,16 @@ class Comments(ListView):
     context_object_name = "comments"    
 
     def get_queryset(self):
-        blog = get_object_or_404(Blog,pk=self.kwargs['pk'])
-        return Comment.objects.filter(blog=blog)
+        Post = get_object_or_404(Post,pk=self.kwargs['pk'])
+        return Comment.objects.filter(Post=Post)
     
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
-    #     context['blog']
-    #     blog = get_object_or_404(Blog,pk=self.kwargs['pk'])
-    #     return Comment.objects.filter(blog=blog)
+    #     context['Post']
+    #     Post = get_object_or_404(Post,pk=self.kwargs['pk'])
+    #     return Comment.objects.filter(Post=Post)
     
     #     return super().get_context_data(**kwargs)
+
+class CommentUpdateView(UpdateView):
+    pass
