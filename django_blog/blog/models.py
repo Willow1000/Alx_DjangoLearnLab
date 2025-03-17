@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.timezone import now
 from django.contrib.auth.models import User
-
+from taggit.managers import TaggableManager
 
 # Create your models here.
 class AuthorManager(BaseUserManager):
