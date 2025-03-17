@@ -51,6 +51,7 @@ class Like(models.Model):
 class Links(models.Model):
     keyword = models.CharField(max_length=100)
     url = models.URLField(max_length=100)
+    post
 class Post(models.Model):
     CATEGORY_CHOICES = (("Beauty","beauty"),
                         ("Lifestyle","lifestyle"),
