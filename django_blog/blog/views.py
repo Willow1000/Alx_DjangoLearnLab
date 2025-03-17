@@ -108,4 +108,14 @@ class Comments(ListView):
     #     return super().get_context_data(**kwargs)
 
 class CommentUpdateView(UpdateView):
-    pass
+    fields = ["content"]
+    template_name = "updateComment.html"
+    model = Comment
+
+    def get_success_url(self):
+        return reverse_lazy("comments")
+
+class CommentDeleteView(DeleteView):
+    template_name = "deleteComment.html"
+    model = Comment
+    reverse_lazy("comments")
