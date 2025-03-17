@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>All Blog Posts</h2>
+    <a href="{% url 'blog_create' %}" class="btn btn-primary mb-3">Create New Post</a>
+    
+    {% for blog in blogs %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4><a href="{% url 'blog_detail' blog.pk %}">{{ blog.title }}</a
