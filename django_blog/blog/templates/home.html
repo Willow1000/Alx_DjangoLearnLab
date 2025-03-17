@@ -1,9 +1,0 @@
-{% extends "parent.html" %}
-{% block title %}Home{% endblock %}
-{% block content %}
-  {% if user.is_authenticated %}
-  <h1>Welcome {{ user.username }}</h1>
-  {% else %}
-  <h1>Hello There</h1>
-  {% endif %}
-{% endblock %}
