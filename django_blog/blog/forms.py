@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 from django import forms
 from .models import CustomUser,Comment
-
+from taggit.forms import TagWidget
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Email Address'}),required=True)
@@ -39,6 +39,7 @@ class LoginForm(AuthenticationForm):
 
 class CommentForm(forms.ModelForm):
     content = forms.CharField(widget = forms.Textarea(attrs={"rows":3,"placeholder":"Comment"}),max_length=500,required=True)
+    tags = forms.CharField(widget=TagWidget(), required=False) 
 
     class Meta:
         model = Comment
