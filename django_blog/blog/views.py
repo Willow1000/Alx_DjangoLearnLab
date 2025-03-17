@@ -42,6 +42,19 @@ class CreatePostView(UserPassesTestMixin,LoginRequiredMixin,CreateView):
     def form_valid(self, form):
         form.instance.Postger = self.request.user
         return super().form_valid(form)
+    
+    def get_queryset(self):
+        """Filter Post posts based on search queries"""
+        query = self.request.GET.get("q")  # Get search query
+        if query:
+            return Post.objects.filter(
+                title__icontains=query  # Search in title
+            ) | Post.objects.filter(
+                content__icontains=query  # Search in content
+            ) | Post.objects.filter(
+                tags__name__icontains=query  # Search in tags (django-taggit)
+            ).distinct()
+        return Post.objects.all()
 
 class ListPostView(ListView):
     model = Post
