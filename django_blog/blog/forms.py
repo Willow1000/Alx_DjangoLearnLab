@@ -44,6 +44,9 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields=['content']
+        widgets = {
+            "tags": TagWidget(), 
+        }
 
     def clean_content(self):
         content = self.cleaned_data.get("content").strip()
