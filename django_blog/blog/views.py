@@ -6,6 +6,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Blog, Comment, Author
 from .forms import SignUpForm, LoginForm, CommentForm
+from django.contrib.auth.decorators import login_required
 
 # Registration View
 class RegistrationView(CreateView):
