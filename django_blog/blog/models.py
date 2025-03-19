@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.timezone import now
 from taggit.managers import TaggableManager
-
+from django.contrib.auth.models import User
 # User Manager
 class AuthorManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -29,7 +29,7 @@ class AuthorManager(BaseUserManager):
     
 
 # Custom User Model
-class Author(AbstractUser):
+class Author(User):
     ROLE_CHOICES = (("Admin", "Admin"), ("Blogger", "Blogger"), ("Viewer", "Viewer"))
     
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default="Viewer")
