@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Blog, Comment, Author
+from .models import Post, Comment, Author
 from .forms import SignUpForm, LoginForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
@@ -36,47 +36,47 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "profile.html"
     login_url = reverse_lazy("login")
 
-# Blog Views
-class CreateBlogView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = Blog
+# Post Views
+class CreatePostView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Post
     fields = ["category", "title", "cover_image", "content"]
-    template_name = "create_blog.html"
-    success_url = reverse_lazy("blogs")
+    template_name = "create_Post.html"
+    success_url = reverse_lazy("Posts")
 
     def test_func(self):
-        return self.request.user.role in ["Blogger", "Admin"]
+        return self.request.user.role in ["Postger", "Admin"]
     
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class ListBlogView(ListView):
-    model = Blog
-    template_name = "blog_list.html"
-    context_object_name = 'blogs'
+class ListPostView(ListView):
+    model = Post
+    template_name = "Post_list.html"
+    context_object_name = 'Posts'
 
-class BlogView(LoginRequiredMixin, DetailView):
-    model = Blog
-    template_name = "blog_detail.html"
-    context_object_name = "blog"
+class PostView(LoginRequiredMixin, DetailView):
+    model = Post
+    template_name = "Post_detail.html"
+    context_object_name = "Post"
     login_url = reverse_lazy('login')  
 
-class DeleteBlogView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
-    model = Blog
-    template_name = "delete_blog.html"
-    success_url = reverse_lazy("blogs")
+class DeletePostView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = "delete_Post.html"
+    success_url = reverse_lazy("Posts")
     
     def test_func(self):
-        return self.request.user.role in ["Blogger", "Admin"]
+        return self.request.user.role in ["Postger", "Admin"]
 
-class UpdateBlogView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
-    model = Blog
+class UpdatePostView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
+    model = Post
     fields = ["title", "cover_image", "content", "category"]
-    template_name = "update_blog.html"
-    success_url = reverse_lazy("blogs")
+    template_name = "update_Post.html"
+    success_url = reverse_lazy("Posts")
     
     def test_func(self):
-        return self.request.user.role in ["Blogger", "Admin"]
+        return self.request.user.role in ["Postger", "Admin"]
 
 # Comments
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -85,12 +85,12 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        blog = get_object_or_404(Blog, pk=self.kwargs['pk'])
-        form.instance.blog = blog
+        Post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        form.instance.Post = Post
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy("blog", kwargs={"pk": self.kwargs["pk"]})
+        return reverse_lazy("Post", kwargs={"pk": self.kwargs["pk"]})
 
 class Comments(ListView):
     model = Comment
@@ -98,8 +98,8 @@ class Comments(ListView):
     context_object_name = "comments"
 
     def get_queryset(self):
-        blog = get_object_or_404(Blog, pk=self.kwargs['pk'])
-        return Comment.objects.filter(blog=blog)
+        Post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        return Comment.objects.filter(Post=Post)
 
 class CommentUpdateView(LoginRequiredMixin, UpdateView):
     model = Comment
@@ -107,20 +107,20 @@ class CommentUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "update_comment.html"
 
     def get_success_url(self):
-        return reverse_lazy("comments", kwargs={"pk": self.object.blog.pk})
+        return reverse_lazy("comments", kwargs={"pk": self.object.Post.pk})
 
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = "delete_comment.html"
 
     def get_success_url(self):
-        return reverse_lazy("comments", kwargs={"pk": self.object.blog.pk})
+        return reverse_lazy("comments", kwargs={"pk": self.object.Post.pk})
 
 # Filter Posts by Tags
 class PostByTagListView(ListView):
-    model = Blog
-    template_name = "blog_list.html"
-    context_object_name = "blogs"
+    model = Post
+    template_name = "Post_list.html"
+    context_object_name = "Posts"
 
     def get_queryset(self):
-        return Blog.objects.filter(tags__slug=self.kwargs['tag_slug'])
+        return Post.objects.filter(tags__slug=self.kwargs['tag_slug'])
