@@ -1,149 +1,125 @@
-from django.shortcuts import render,redirect,get_object_or_404
-from django.views.generic import CreateView,TemplateView,ListView,DetailView,UpdateView,DeleteView
-from .forms import SignUpForm,LoginForm,CommentForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import CreateView, TemplateView, ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.contrib.auth.views import LoginView ,LogoutView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import *
-# Create your views here.
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import ProfileForm  # Ensure you create this form
+from .models import Blog, Comment, Author
+from .forms import SignUpForm, LoginForm, CommentForm
 
-@login_required
-def update_profile(request):
-    if request.method == "POST":
-        form = ProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()  # ✅ Save updated user details
-            return redirect("profile")  # Redirect after updating profile
-    else:
-        form = ProfileForm(instance=request.user)  # Pre-fill form with user details
-    
-    return render(request, "profile_update.html", {"form": form})
-
+# Registration View
 class RegistrationView(CreateView):
     form_class = SignUpForm
     template_name = "register.html"
     success_url = reverse_lazy('home')
 
+# Home View
 class HomeView(TemplateView):
     template_name = 'home.html'
 
-
+# Login and Logout Views
 class CustomLoginView(LoginView):
     form_class = LoginForm
     template_name = 'login.html'
-    # redirect_authenticated_user = True
-    next_page= reverse_lazy('home')
+    next_page = reverse_lazy('home')
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("home")    
+    next_page = reverse_lazy("home")
+    
     def dispatch(self, request, *args, **kwargs):
-        logout(request)  # Ensure session is cleared
+        logout(request)
         return redirect(self.next_page)
 
+# Profile View
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "profile.html"
+    login_url = reverse_lazy("login")
 
-class CreatePostView(UserPassesTestMixin,LoginRequiredMixin,CreateView):
-    model = Post
-    fields = ["category","Title",'Cover_image',"Content"]
-    template_name = "createPost.html"
-    success_url = reverse_lazy("home")
+# Blog Views
+class CreateBlogView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Blog
+    fields = ["category", "title", "cover_image", "content"]
+    template_name = "create_blog.html"
+    success_url = reverse_lazy("blogs")
 
     def test_func(self):
-        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
+        return self.request.user.role in ["Blogger", "Admin"]
     
     def form_valid(self, form):
-        form.instance.Postger = self.request.user
+        form.instance.author = self.request.user
         return super().form_valid(form)
-    
-    def get_queryset(self):
-        """Filter Post posts based on search queries"""
-        query = self.request.GET.get("q")  # Get search query
-        if query:
-            return Post.objects.filter(
-                title__icontains=query  # Search in title
-            ) | Post.objects.filter(
-                content__icontains=query  # Search in content
-            ) | Post.objects.filter(
-                tags__name__icontains=query  # Search in tags (django-taggit)
-            ).distinct()
-        return Post.objects.all()
 
-class ListPostView(ListView):
-    model = Post
-    template_name = "Posts.html"
-    context_object_name = 'Posts'
+class ListBlogView(ListView):
+    model = Blog
+    template_name = "blog_list.html"
+    context_object_name = 'blogs'
 
-class PostView(LoginRequiredMixin,DetailView):
-    model=Post
-    template_name="Post.html"
-    context_object_name="Post"  
+class BlogView(LoginRequiredMixin, DetailView):
+    model = Blog
+    template_name = "blog_detail.html"
+    context_object_name = "blog"
     login_url = reverse_lazy('login')  
 
-class DeletePostView(UserPassesTestMixin,LoginRequiredMixin,DeleteView):
-    model=Post
-    template_name="Post.html"
-    context_object_name="Post"
-    success_url = reverse_lazy('Posts')  
+class DeleteBlogView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+    model = Blog
+    template_name = "delete_blog.html"
+    success_url = reverse_lazy("blogs")
+    
     def test_func(self):
-        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
+        return self.request.user.role in ["Blogger", "Admin"]
+
+class UpdateBlogView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
+    model = Blog
+    fields = ["title", "cover_image", "content", "category"]
+    template_name = "update_blog.html"
+    success_url = reverse_lazy("blogs")
     
-
-class UpdatePostView(UserPassesTestMixin,LoginRequiredMixin,UpdateView):
-    model = Post
-    template_name="updatePost.html"   
-    success_url = reverse_lazy("Posts") 
-    fields = ["Title","Cover_image","Content",'category']
-    context_object_name='record'
-
     def test_func(self):
-        return self.request.user.role == "Postger" or self.request.user.role == "Admin" 
-    
-    def get_success_url(self):
-        return reverse_lazy("Post",kwargs = {"pk":self.kwargs["pk"]})
-    
-class CommentCreateView(CreateView):
+        return self.request.user.role in ["Blogger", "Admin"]
+
+# Comments
+class CreateComment(LoginRequiredMixin, CreateView):
     form_class = CommentForm
-    template_name = "commentform.html" 
-    # success_url = reverse_lazy("Post")   
+    template_name = "comment_form.html"
 
-    def form_valid(self,form):
+    def form_valid(self, form):
         form.instance.user = self.request.user
-        Post = get_object_or_404(Post,pk = self.kwargs['pk'])
-        form.instance.Post = Post
+        blog = get_object_or_404(Blog, pk=self.kwargs['pk'])
+        form.instance.blog = blog
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy("Post",kwargs = {"pk":self.kwargs["pk"]})
-    
+        return reverse_lazy("blog", kwargs={"pk": self.kwargs["pk"]})
+
 class Comments(ListView):
     model = Comment
     template_name = "comments.html"
-    context_object_name = "comments"    
+    context_object_name = "comments"
 
     def get_queryset(self):
-        Post = get_object_or_404(Post,pk=self.kwargs['pk'])
-        return Comment.objects.filter(Post=Post)
-    
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['Post']
-    #     Post = get_object_or_404(Post,pk=self.kwargs['pk'])
-    #     return Comment.objects.filter(Post=Post)
-    
-    #     return super().get_context_data(**kwargs)
+        blog = get_object_or_404(Blog, pk=self.kwargs['pk'])
+        return Comment.objects.filter(blog=blog)
 
-class CommentUpdateView(UpdateView):
-    fields = ["content"]
-    template_name = "updateComment.html"
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
     model = Comment
+    fields = ["content"]
+    template_name = "update_comment.html"
 
     def get_success_url(self):
-        return reverse_lazy("comments")
+        return reverse_lazy("comments", kwargs={"pk": self.object.blog.pk})
 
-class CommentDeleteView(DeleteView):
-    template_name = "deleteComment.html"
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
-    reverse_lazy("comments")
+    template_name = "delete_comment.html"
+
+    def get_success_url(self):
+        return reverse_lazy("comments", kwargs={"pk": self.object.blog.pk})
+
+# Filter Posts by Tags
+class PostByTagListView(ListView):
+    model = Blog
+    template_name = "blog_list.html"
+    context_object_name = "blogs"
+
+    def get_queryset(self):
+        return Blog.objects.filter(tags__slug=self.kwargs['tag_slug'])
