@@ -63,7 +63,7 @@ class ListPostView(ListView):
                 return Post.objects.filter(Blogger=blogger)
 
             else:
-                return Post.objects.filter(title__contains=query) | Post.objects.filter(Time__icontains = query) | Post.objects.filter(content__icontains=query) | Post.objects.filter(tags__name__contains = query)
+                return Post.objects.filter(title__icontains=query) | Post.objects.filter(Time__icontains = query) | Post.objects.filter(content__icontains=query) | Post.objects.filter(tags__name__icontains = query)
         return Post.objects.all()
         return super().get_queryset()
 
