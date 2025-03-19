@@ -8,6 +8,8 @@ from .models import Post, Comment, Author
 from .forms import SignUpForm, LoginForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
+
+method = "POST"
 # Registration View
 class RegistrationView(CreateView):
     form_class = SignUpForm
