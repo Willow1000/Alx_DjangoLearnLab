@@ -79,7 +79,7 @@ class UpdateBlogView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
         return self.request.user.role in ["Blogger", "Admin"]
 
 # Comments
-class CreateComment(LoginRequiredMixin, CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     form_class = CommentForm
     template_name = "comment_form.html"
 
