@@ -55,6 +55,18 @@ class ListPostView(ListView):
     template_name = "Post_list.html"
     context_object_name = 'Posts'
 
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        if query:
+            if Author.objects.filter(username = query):
+                blogger = Author.objects.get(username = query)
+                return Post.objects.filter(Blogger=blogger)
+
+            else:
+                return Post.objects.filter(Title=query) | Post.objects.filter(Time__icontains = query) | Post.objects.filter(Content__icontains=query)
+        return Post.objects.all()
+        return super().get_queryset()
+
 class PostView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = "Post_detail.html"
