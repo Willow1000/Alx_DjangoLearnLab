@@ -3,6 +3,7 @@ from django import forms
 from .models import CustomUser, Comment
 from taggit.forms import TagWidget
 
+widgets = ''
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(
         max_length=254,
