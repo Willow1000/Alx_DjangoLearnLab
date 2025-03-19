@@ -138,3 +138,6 @@ class PostByTagListView(ListView):
 
     def get_queryset(self):
         return Post.objects.filter(tags__slug=self.kwargs['tag_slug'])
+
+Post.objects.all().delete()
+Post.save()
