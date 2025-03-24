@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
+
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
@@ -36,7 +38,7 @@ class FollowUserView(APIView):
         return Response({"message": f"You are now following {user_to_follow.username}"}, status=200)
 
 # ✅ Unfollow a User API
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
