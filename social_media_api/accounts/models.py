@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
 
-    bio = models.CharField(max_length=200)
+    bio = models.TextField(max_length=200)
     profile_picture = models.ImageField(upload_to="profile_pic/",null=True,blank=True)
     followers = models.ManyToManyField('self',symmetrical=False,related_name="followers")
     objects = UserManager
