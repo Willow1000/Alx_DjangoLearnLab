@@ -34,3 +34,11 @@ class LikePost(APIView):
         Like.objects.get_or_create(user=request.user, post=post)
         verb = f"{request.user} like a post by {post.author}"
         Notification.objects.create(recipient = post.author,actor=request.user,verb = verb,target = post.author)
+
+class UnlikePost(APIView):
+    def post(self,request):
+        pk = request.kwargs['pk']
+        post = generics.get_object_or_404(Post, pk=pk)
+        Like.objects.get(user=request.user, post=post).delete()
+        verb = f"{request.user} unliked a post by {post.author}"
+        Notification.objects.create(recipient = post.author,actor=request.user,verb = verb,target = post.author)
