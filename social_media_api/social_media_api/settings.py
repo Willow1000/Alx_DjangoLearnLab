@@ -1,4 +1,6 @@
 from pathlib import Path
+import django_heroku
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,12 +10,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7)uq!#4%(@dvp6vxgpdbg=!r^_8%b3k+t*h1v#n#e1dx-2gn7('
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -61,14 +63,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'social_media_api.wsgi.application'
 
+from dotenv import load_dotenv
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+import os
+load_dotenv()
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ("DB_NAME"),
+        "HOST": os.environ("DB_HOST"),
+        "PORT": os.environ("DB_PORT"),
+        "PASSWORD": os.environ("DB_PASS")
     }
 }
 
@@ -115,3 +122,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "accounts.User"
+# Deployment config
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")
+STATICFILES_DIR = (os.path.join(BASE_DIR,"static"))
+django_heroku.settings(locals())
