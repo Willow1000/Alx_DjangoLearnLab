@@ -1,4 +1,5 @@
-from django.test import TestCase
+from django.test import TestCase,Client
+from rest_framework.test import APIClient,APITestCase
 from .models import CustomUser
 # Create your tests here.
 
@@ -15,3 +16,11 @@ class TestCustomUser(TestCase):
           )
           self.assertEqual(customuser.role,'blogger')
           self.assertEqual(customuser.username,'user1')
+
+class TestAuthor(TestCase):
+     def setUp(self):
+          self.client = Client()
+          return super().setUp()  
+
+     def test_create_author(self):
+          pass
