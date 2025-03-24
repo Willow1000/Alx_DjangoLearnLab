@@ -22,3 +22,4 @@ class FollowingViews(APIView):
         followingPosts = Post.objects.filter(author__in = following_users).order_by
         permission_classes = [permissions.IsAuthenticated]
         return followingPosts
+Post.objects.filter(author__in=following_users).order_by
