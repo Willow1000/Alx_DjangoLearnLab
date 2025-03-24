@@ -31,6 +31,6 @@ class LikePost(APIView):
         
         pk = request.kwargs['pk']
         post = generics.get_object_or_404(Post, pk=pk)
-        Like.objects.get_or_create(user = request.user, post=post)
+        Like.objects.get_or_create(user=request.user, post=post)
         verb = f"{request.user} like a post by {post.author}"
         Notification.objects.create(recipient = post.author,actor=request.user,verb = verb,target = post.author)
