@@ -25,3 +25,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
+def follow(request):
+    pass
+
+def unfollow(request):
+    pass

@@ -30,8 +30,9 @@ class User(AbstractUser):
 
     bio = models.TextField(max_length=200)
     profile_picture = models.ImageField(upload_to="profile_pic/",null=True,blank=True)
-    followers = models.ManyToManyField('self',symmetrical=False,related_name="followers")
-    objects = UserManager
+    followers = models.ManyToManyField('self',symmetrical=False,related_name="user_followers")
+    following = models.ManyToManyField('self',symmetrical=False,related_name="user_following")
+    objects = UserManager()
     permissions = models.ManyToManyField(Permission,related_name="user_permissions")
     groups = models.ManyToManyField(Group,related_name="user_group")
 
