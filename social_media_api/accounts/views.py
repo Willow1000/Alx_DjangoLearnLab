@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
-
+from .models import *
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
@@ -65,5 +65,4 @@ class UserProfileView(DetailView):
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
 

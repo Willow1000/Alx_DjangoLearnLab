@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from rest_framework import permissions
+from accounts.models import *
 from .serializers import *
 # Create your views here.
 
@@ -16,6 +18,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class FollowingViews(APIView):
 
     def get(self,request,format=None):
-        followingPosts = Post.objects.filter(author__in = request.user.following)
-
+        following_users = request.user.following.all()
+        followingPosts = Post.objects.filter(author__in = following_users).order_by("title")
+        permission_classes = [permissions.IsAuthenticated]
         return followingPosts
