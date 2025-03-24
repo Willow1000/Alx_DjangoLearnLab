@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework import permissions
 from accounts.models import *
 from .serializers import *
+from notifications.models import Notification
 # Create your views here.
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -23,3 +25,12 @@ class FollowingViews(APIView):
         permission_classes = [permissions.IsAuthenticated]
         return followingPosts
 Post.objects.filter(author__in=following_users).order_by
+
+class LikePost(APIView):
+    def post(self,request):
+        
+        pk = request.kwargs['pk']
+        post = generics.get_object_or_404(Post,pk =pk )
+        Like.objects.get_or_create(user = request.user,post =post )
+        verb = f"{request.user} like a post by {post.author}"
+        Notification.objects.create(recipient = post.author,actor=request.user,verb = verb,target = post.author)
